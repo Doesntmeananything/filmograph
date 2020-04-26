@@ -1,58 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Row, Col } from "antd";
+import { Counter } from "./features/counter/Counter";
+import {
+  selectFilms,
+  selectErrorMessage,
+  selectLoadingStatus,
+  fetchFilms,
+} from "./features/search/searchSlice";
+import { Header } from "./features/search/Header";
+import { Movie } from "./features/search/Movie";
+import { Search } from "./features/search/Search";
+import "./App.css";
 
-function App() {
+export const App = () => {
+  const films = useSelector(selectFilms);
+  const errorMessage = useSelector(selectErrorMessage);
+  const loading = useSelector(selectLoadingStatus);
+
+  const dispatch = useDispatch();
+
+  const searchFilms = (searchQuery: string) => {
+    dispatch(fetchFilms(searchQuery));
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
+      <Header />
+      <Search searchFilms={searchFilms} loading={loading} />
+      {errorMessage ? (
+        <div>{errorMessage}</div>
+      ) : (
+        <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }} style={{ margin: 0 }}>
+          {films.map((film) => (
+            <Col className="gutter-row" span={6} key={film.Title}>
+              <Movie movie={film} />
+            </Col>
+          ))}
+        </Row>
+      )}
+      <Counter />
     </div>
   );
-}
-
-export default App;
+};
